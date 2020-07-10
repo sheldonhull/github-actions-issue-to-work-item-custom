@@ -149,6 +149,11 @@ async function create(vm) {
 				url: vm.url,
 			},
 		},
+		{
+			op: "add",
+			path: "/fields/System.IterationPath",
+			value: "@CurrentIteration",
+		},
 	];
 
 	// if area path is not empty, set it
