@@ -308,6 +308,11 @@ async function reopen(vm, workItem) {
 		path: "/fields/System.History",
 		value: "Issue reopened",
 	});
+	patchDocument.push({
+		op: "add",
+		path: "/fields/System.IterationPath",
+		value: "@CurrentIteration",
+	});
 
 	if (patchDocument.length > 0) {
 		return await updateWorkItem(patchDocument, workItem.id, vm.env);
