@@ -11,7 +11,7 @@ async function main() {
 	try {
 		const context = github.context;
 		const env = process.env;
-
+		console.log("Loaded context and env");
 		let vm = [];
 
 		if (debug) {
@@ -23,6 +23,7 @@ async function main() {
 			env.ado_wit = "User Story";
 			env.ado_close_state = "Closed";
 			env.ado_new_state = "New";
+			env.ado_iteration_path = "@CurrentIteration";
 
 			console.log("Set values from test payload");
 			vm = getValuesFromPayload(testPayload, env);
@@ -111,6 +112,7 @@ async function main() {
 
 // create Work Item via https://docs.microsoft.com/en-us/rest/api/azure/devops/
 async function create(vm) {
+	console.log("Creating work item");
 	let patchDocument = [
 		{
 			op: "add",
@@ -152,7 +154,7 @@ async function create(vm) {
 		{
 			op: "add",
 			path: "/fields/System.IterationPath",
-			value: "@CurrentIteration",
+			value: vm.ado_iteration_path,
 		},
 	];
 
@@ -171,6 +173,7 @@ async function create(vm) {
 	let workItemSaveResult = null;
 
 	try {
+		console.log("running client.createWorkItem")
 		workItemSaveResult = await client.createWorkItem(
 			(customHeaders = []),
 			(document = patchDocument),
@@ -204,6 +207,7 @@ async function create(vm) {
 
 // update existing working item
 async function update(vm, workItem) {
+	console.log("updating matched workitem");
 	let patchDocument = [];
 
 	if (
@@ -234,6 +238,7 @@ async function update(vm, workItem) {
 
 // add comment to an existing work item
 async function comment(vm, workItem) {
+	console.log("async function comment");
 	let patchDocument = [];
 
 	if (vm.comment_text != "") {
@@ -300,6 +305,7 @@ async function close(vm, workItem) {
 
 // reopen existing work item
 async function reopen(vm, workItem) {
+	console.log("async function reopen");
 	let patchDocument = [];
 
 	patchDocument.push({
@@ -328,6 +334,7 @@ async function reopen(vm, workItem) {
 
 // add new label to existing work item
 async function label(vm, workItem) {
+	console.log("async function label");
 	let patchDocument = [];
 
 	if (!workItem.fields["System.Tags"].includes(vm.label)) {
@@ -346,6 +353,7 @@ async function label(vm, workItem) {
 }
 
 async function unlabel(vm, workItem) {
+	console.log("async function unlabel");
 	let patchDocument = [];
 
 	if (workItem.fields["System.Tags"].includes(vm.label)) {
@@ -368,6 +376,7 @@ async function unlabel(vm, workItem) {
 
 // find work item to see if it already exists
 async function find(vm) {
+	console.log("async function find");
 	let authHandler = azdev.getPersonalAccessTokenHandler(vm.env.adoToken);
 	let connection = new azdev.WebApi(vm.env.orgUrl, authHandler);
 	let client = null;
@@ -429,6 +438,7 @@ async function find(vm) {
 
 // standard updateWorkItem call used for all updates
 async function updateWorkItem(patchDocument, id, env) {
+	console.log("async functio updateWorkItem");
 	let authHandler = azdev.getPersonalAccessTokenHandler(env.adoToken);
 	let connection = new azdev.WebApi(env.orgUrl, authHandler);
 	let client = await connection.getWorkItemTrackingApi();
@@ -455,6 +465,7 @@ async function updateWorkItem(patchDocument, id, env) {
 // update the GH issue body to include the AB# so that we link the Work Item to the Issue
 // this should only get called when the issue is created
 async function updateIssueBody(vm, workItem) {
+	console.log("async function updateIssueBody");
 	var n = vm.body.includes("AB#" + workItem.id.toString());
 
 	if (!n) {
@@ -476,6 +487,7 @@ async function updateIssueBody(vm, workItem) {
 
 // get object values from the payload that will be used for logic, updates, finds, and creates
 function getValuesFromPayload(payload, env) {
+	console.log("async function getValuesFromPayload");
 	// prettier-ignore
 	var vm = {
 		action: payload.action != undefined ? payload.action : "",
