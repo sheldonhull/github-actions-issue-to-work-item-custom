@@ -350,7 +350,7 @@ async function unlabel(vm, workItem) {
 
 	if (workItem.fields["System.Tags"].includes(vm.label)) {
 		var str = workItem.fields["System.Tags"];
-		var res = str.replace(vm.label + "; ", "");
+		var res = str.toString().replace(vm.label + "; ", "");
 
 		patchDocument.push({
 			op: "add",
